@@ -65,8 +65,8 @@ return
 ;Control & Space::Suspend ; disables bc it conflicts with Eclipse shortcuts
 
 ; Not exactly mirror but as close as we can get, Capslock enter, Tab backspace.
-Space & Escape::Send {Enter} ; for users with Caps mapped to Esc
 Space & CapsLock::Send {Enter}
+Space & Escape::Send {Enter} ; for users with Caps mapped to Esc
 Space & Tab::Send {Backspace}
 
 ; If spacebar didn't modify anything, send a real space keystroke upon release.

@@ -14,6 +14,6 @@ FileRead lastFileContent, %actionFile%
 		SoundBeep 300, 300
 		Reload
 	} else {
-		openOpentms("IncidentList:")
+		openOpentms("ContactPlace:Contacts", 1, 3)
 	}
 Return

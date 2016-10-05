@@ -10,9 +10,14 @@
 ; Included for posterity. Lack of quotes is important from cmd onward.
 ; RunWait cscript.exe C:\cygwin\home\ethanp\vbs\hideBatch.vbs cmd /c chromix with .*127\.0\.0\.1:8888.* close, , hide
 
-opentmsRoot := "http://127.0.0.1:8888/#"
+; Uncomment the line below if you don't know which window is which
+;identifyWindows()
 
-openOpentms(page:="") {
+opentmsRoot := "http://127.0.0.1:8888/#"
+defaultPosition := 3
+
+openOpentms(page:="", pos=0, mon=0) {
+	global defaultPosition
 	global opentmsRoot
 
 	RunWait %comspec% "/c chromix with .*127\.0\.0\.1:8888.* close", , hide
@@ -21,10 +26,79 @@ openOpentms(page:="") {
 
 	Run, "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" -incognito %opentmsUrl%, , chromeId
 
-	WinWait, ahk_exe chrome.exe
+	window := "ahk_exe chrome.exe"
+	WinWait, %window%
 	Sleep, 250
-	moveToLeftMonitorRightHalf()
-	;moveToLeftMonitorFullscreen()
+
+	;If (pos = 3)
+	;	moveToLeftMonitorRightHalf()
+	;Else	
+	;	moveToLeftMonitorFullscreen()
+	moveWindow(window, pos, mon) 
+}
+
+moveWindow(window, pos=0, mon=0) {
+	global defaultPosition
+
+	if (pos = 0)
+		pos := defaultPosition
+
+	if (mon = 0)
+		SysGet, mon, MonitorPrimary
+
+	WinRestore, %window%
+
+	getPos(pos, mon, x, w, y, h)
+
+	if (pos = 1) {
+		WinMove, %window%,, %x%, %y%
+		WinMaximize, %window%
+	} else {
+		WinMove, %window%,, %x%, %w%, %y%, %h%
+	}
+}
+
+getPos(pos, monNumber, byref x, byref width, byref y, byref height)  {
+	; instead of all the math, I could just get the monitor to the proper
+	;	monitor and then rely on shortcuts (how do quarter shortcuts work?)
+
+	; positions:
+	; 1 full screen
+	; 2 left half
+	; 3 right half
+	; 4 top half
+	; 5 bottom half
+	; 6 top left corner
+	; 7 top right corner
+	; 8 bottom left corner
+	; 9 bottom right corner
+	
+	SysGet, mon, MonitorWorkArea, %monNumber%
+
+	monWidth := monRight - monLeft
+	monHeight := monBottom - monTop
+
+	x := monLeft
+	y := monTop
+	width := monWidth
+	height := monHeight
+
+	if (pos = 1)
+		max := "true"
+
+	if (pos = 3) or (pos = 7) or (pos = 9)
+		x := (monLeft+monRight)//2
+
+	if (pos = 5) or (pos = 8) or (pos = 9)
+		y := (monTop+monBottom)//2
+
+	if (pos = 2) or (pos = 3) or (pos >= 6 and pos <= 9)
+		width//=2
+
+	if (pos >= 4) and (pos <= 9)
+		height//=2
+
+	; return x, width, y, height
 }
 
 moveToLeftMonitorRightHalf(){
@@ -43,3 +117,39 @@ moveToLeftMonitorFullscreen(){
 	WinMove, ahk_exe chrome.exe,,-1900,10
 	WinMaximize, ahk_exe chrome.exe
 }
+
+identifyMonitors(mon=0){
+	if (mon = 0) {
+		SysGet, count, MonitorCount
+
+		Loop, %count% {
+			SysGet, mon, MonitorWorkArea, %A_Index%
+			Gui, New
+			Gui, add, text,, %A_Index%
+			Gui, Add, Button, default, Close
+			
+			x := (monLeft + monRight)//2
+			y := (monTop + monBottom)//2
+			Gui, show, x%x% y%y% w100
+
+		}
+	} else {
+		SysGet, mon, MonitorWorkArea, %A_Index%
+		Gui, New
+		Gui, add, text,, %A_Index%
+		Gui, Add, Button,, Close
+		
+		x := (monLeft + monRight)//2
+		y := (monTop + monBottom)//2
+		Gui, show, x%x% y%y% w100
+	}	
+
+}
+
+return
+GuiClose:
+ButtonClose: 
+{
+	exitapp
+}
+return
