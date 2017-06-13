@@ -11,7 +11,7 @@
 ; RunWait cscript.exe C:\cygwin\home\ethanp\vbs\hideBatch.vbs cmd /c chromix with .*127\.0\.0\.1:8888.* close, , hide
 
 ; Uncomment the line below if you don't know which window is which
-;identifyWindows()
+;identifyMonitors()
 
 opentmsRoot := "http://127.0.0.1:8888/#"
 defaultPosition := 3
@@ -49,12 +49,13 @@ moveWindow(window, pos=0, mon=0) {
 	WinRestore, %window%
 
 	getPos(pos, mon, x, w, y, h)
+	;MsgBox %pos% %mon% %x% %y% %w% %h%
 
 	if (pos = 1) {
 		WinMove, %window%,, %x%, %y%
 		WinMaximize, %window%
 	} else {
-		WinMove, %window%,, %x%, %w%, %y%, %h%
+		WinMove, %window%,, %x%, %y%, %w%, %h%
 	}
 }
 
@@ -86,15 +87,19 @@ getPos(pos, monNumber, byref x, byref width, byref y, byref height)  {
 	if (pos = 1)
 		max := "true"
 
+	; right side
 	if (pos = 3) or (pos = 7) or (pos = 9)
 		x := (monLeft+monRight)//2
 
+	; bottom
 	if (pos = 5) or (pos = 8) or (pos = 9)
 		y := (monTop+monBottom)//2
 
+	; width
 	if (pos = 2) or (pos = 3) or (pos >= 6 and pos <= 9)
 		width//=2
 
+	; height
 	if (pos >= 4) and (pos <= 9)
 		height//=2
 

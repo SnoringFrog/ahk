@@ -12,8 +12,10 @@ FileRead lastFileContent, %actionFile%
 	FileRead newFileContent, %actionFile%
 	if(newFileContent != lastFileContent) {
 		SoundBeep 300, 300
+		lastFileContent = newFileContent
 		Reload
 	} else {
-		openOpentms("ContactPlace:Contacts", 1, 3)
+; ContactPlace:Contacts
+		openOpentms("", 1, 3) ; page, position, monitor
 	}
 Return
